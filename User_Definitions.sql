@@ -1,6 +1,6 @@
 --CREATE USER SPECIFICALLY FOR USE IN OUR PYTHON APPLICATION
 CREATE USER
-  ApplicationUser
+  "ApplicationUser"
 WITH
   PASSWORD 'CoronaSux2020!';
 
@@ -15,7 +15,7 @@ ON
 IN
   SCHEMA public
 TO
-  ApplicationUser;
+  "ApplicationUser";
 
 GRANT
   ALL PRIVILEGES
@@ -24,7 +24,7 @@ ON
 IN
   SCHEMA public
 TO
-  ApplicationUser;
+  "ApplicationUser";
 
 ALTER
   DEFAULT PRIVILEGES
@@ -38,4 +38,4 @@ GRANT
 ON
   TABLES
 TO
-  ApplicationUser;
+  "ApplicationUser";
