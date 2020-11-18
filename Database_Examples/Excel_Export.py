@@ -7,7 +7,7 @@ try:
     now = datetime.datetime.now()
 
     # This connection information is for the User created within the database using:
-    #sudo -u postgres createuser --interactive --pwprompt
+    # sudo -u postgres createuser --interactive --pwprompt
     db_conn = psycopg2.connect(user = "ApplicationUser", password = "CoronaSux2020!", host = "localhost", port = "5432", database = "postgres")
 
     # Create dictionary cursor in order for pulling data into.
@@ -25,14 +25,15 @@ try:
 
     # Create a workbook and add a worksheet.
     workbook = xlsxwriter.Workbook('Attendance_{}{}{}.xlsx'.format(now.strftime("%b"), now.day, now.year))
-    #TODO write logic for dynamically gathering the class and section for the exported attendance spreadsheet
+    # TODO write logic for dynamically gathering the class and section for the exported attendance spreadsheet
     worksheet = workbook.add_worksheet('Class_Section_TODO')
     # Dynamically print all records in the dictionary cursor using their column name and the value
     column_names = [desc[0] for desc in dict_cur.description]
-    #Global variables
+    # Global variables
     COUNTER = 0
     COL_COUNTER = 0
     ROW_COUNTER = 1
+    # Parse through the dictionary cursor and write each cell of data
     for record in dict_cur:
         for column in record:
             if(COUNTER == 0):
@@ -51,7 +52,7 @@ except(Exception, psycopg2.Error) as error:
     print("Error while connecting", error)
 
 finally:
-    #closing database connection.
+    # Closing database connection.
     if(db_conn):
         dict_cur.close()
         db_conn.close()

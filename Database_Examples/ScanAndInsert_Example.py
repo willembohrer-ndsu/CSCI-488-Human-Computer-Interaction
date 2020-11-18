@@ -4,6 +4,9 @@ import RPi.GPIO as GPIO
 from mfrc522 import SimpleMFRC522
 
 try:
+    # Constant value for which room the Pi is located in.
+    ROOM_ID = 1;
+
     reader = SimpleMFRC522()
 
     # This connection information is for the User created within the database using:
@@ -19,29 +22,9 @@ try:
 
     # Execute an SQL statement and store the results in the dictionary cursor
     dict_cur.execute("""
-                    SELECT
-                        P.NAME AS {},
-                        R.NAME AS {},
-                        A.NAME AS {},
-                        A.DESCRIPTION AS {}
-                    FROM
-                        PROFESSOR P
-                        INNER JOIN ROLE R ON
-                            R.ID = P.ROLE_ID
-                        INNER JOIN ACCESS A ON
-                            A.ID = P.ACCESS_ID
-                    WHERE
-                        P.NAME = '{}';
-                    """.format('\"Professor\"','\"Role\"','\"Access\"','\"Access Description\"', scanned_data))
+                    CALL LOG_ATTENDANCE({}, {}); COMMIT;
+                    """.format(ROOM_ID, scanned_data))
 
-    # Dynamically print all records in the dictionary cursor using their column name and the value
-    column_names = [desc[0] for desc in dict_cur.description]
-    for record in dict_cur:
-        COUNTER = 0
-        for column in record:
-            print('{}: {}'.format(column_names[COUNTER], column))
-            COUNTER += 1
-        print('\n')
 
 except(Exception, psycopg2.Error) as error:
     print("Error while connecting", error)
