@@ -13,7 +13,7 @@ try:
     # sudo -u postgres createuser --interactive --pwprompt
     db_conn = psycopg2.connect(user = "ApplicationUser", password = "CoronaSux2020!", host = "localhost", port = "5432", database = "postgres")
 
-    # Scan card's data and remove any trailing spaces from the string. In this example, I am using a Professor's name as the card's data.
+    # Scan card's data and remove any trailing spaces from the string. In this example, I am using a Student's ID as the card's data.
     id, scanned_data = reader.read()
     scanned_data = scanned_data.strip()
 
