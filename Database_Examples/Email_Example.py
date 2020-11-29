@@ -2,9 +2,11 @@ import psycopg2
 import psycopg2.extras
 import smtplib
 import csv
+import datetime
 
-try: 
-
+try:
+    ROOM_ID = 1
+    now = datetime.datetime.now()
     # This connection information is for the User created within the database using:
     #sudo -u postgres createuser --interactive --pwprompt
     db_conn = psycopg2.connect(user = "ApplicationUser", password = "CoronaSux2020!", host = "localhost", port = "5432", database = "postgres")
@@ -14,13 +16,19 @@ try:
 
     # Execute an SQL statement and store the results in the dictionary cursor
     dict_cur.execute("""
-                    SELECT
-                        P.FIRSTNAME AS {},
-                        P.LASTNAME AS {},
-                        P.EMAILADDRESS AS {}
-                    FROM
-                        PROFESSOR P;
-                    """.format('\"First Name\"','\"Last Name\"','\"Email Address\"'))
+                SELECT
+                    C.NAME,
+                    C.SECTION,
+                    P.EMAILADDRESS,
+                    P.LASTNAME
+                FROM
+                    PROFESSOR P
+                    INNER JOIN ROOM_SCHEDULE RS ON
+                        RS.ROOM_ID = {}
+                    INNER JOIN CLASS C ON
+                        C.ROOM_SCHEDULE_ID = RS.ID AND
+                        C.PROFESSOR_ID = P.ID;
+                """.format(ROOM_ID))
 
     # Establish email port and server
     port = 465
@@ -30,16 +38,25 @@ try:
     sender = "hci.488.2020@gmail.com"
     email_password = "Human_Computer_Int488"
 
-    # Email message
-    message = """\
-    Subject: Class Attendance
-    To: {recipient}
-    From: {sender}
+    messages = []
+    for record in dict_cur:
+        # Email message
+        message = """\
+        Subject: Class Attendance {} - Section {}
+        To: {}
+        From: {}
 
-    Greetings Professor {LASTNAME}, this is your email test.
-    These students attending class on (insert date here)
-    (insert list of students here)
-    """
+        Greetings, Professor {}.
+
+        Attached is the attendance for {} - section {}, on {} {}, {}
+        (insert excel file of students here)
+        """.format(record[0], record[1], sender, record[2], record[3], record[0], record[1], now.strftime("%b"), now.day, now.year)
+        messages.append(message)
+
+    # Prints all the messages, this is where the email sending logic should go.
+    for message in messages:
+        print(message)
+        
     # Create and read a CSV file with list of professors
     # Login to server with email and password
     with smtplib.SMTP("smtp.gmail.com", 465) as server:
