@@ -22,7 +22,7 @@ try:
 
     # Execute an SQL statement and store the results in the dictionary cursor
     dict_cur.execute("""
-                    CALL LOG_ATTENDANCE({}, {}); COMMIT;
+                    CALL LOG_ATTENDANCE({}, {});
                     """.format(ROOM_ID, scanned_data))
 
 
