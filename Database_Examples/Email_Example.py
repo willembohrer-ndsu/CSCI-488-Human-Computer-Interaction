@@ -50,13 +50,13 @@ try:
 
         Attached is the attendance for {} - section {}, on {} {}, {}
         (insert excel file of students here)
-        """.format(record[0], record[1], sender, record[2], record[3], record[0], record[1], now.strftime("%b"), now.day, now.year)
+        """.format(record[0], record[1], record[2], sender, record[3], record[0], record[1], now.strftime("%b"), now.day, now.year)
         messages.append(message)
 
     # Prints all the messages, this is where the email sending logic should go.
     for message in messages:
         print(message)
-        
+
     # Create and read a CSV file with list of professors
     # Login to server with email and password
     with smtplib.SMTP("smtp.gmail.com", 465) as server:
