@@ -55,37 +55,35 @@ try:
         # Add body to email
         message.attach(MIMEText(body, "plain"))
 
-        filename = 'Attendance_{}{}{}.xlsx'.format(now.strftime("%b"), now.day, now.year)
+        filename = "Attendance_{}{}{}.xlsx".format(now.strftime("%b"), now.day, now.year)
 
         # Open PDF file in binary mode - need to do xcel
         with open(filename, "rb") as attachment:
             part = MIMEBase("application", "octet-stream")
             part.set_payload(attachment.read())
-
         # Encode file in ASCII characters to send by email
         encoders.encode_base64(part)
 
         # Add header as key/value pair to attachment part
         part.add_header(
-           "Content-Disposition",
-           f"attachment; filename = {filename}"
+           "Content-Disposition", "attachment", filename = filename
          )
-
         # Add attachment to message and convert message to string
         message.attach(part)
         text = message.as_string()
-
+        print(sender, email_password)
         # Login to server and send email
         context = ssl.create_default_context()
-        with smtplib.SMTP("smtp.gmail.com", 465) as server:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.ehlo()
             server.login(sender, email_password)
-        
+
         # Create CSV file of first name, last name, and email address of PROFESSORS
         with open("emails.csv") as csv_file:
             csv_writer = csv.writer(csv_file)
             csv_writer.writerow([i[0] for i in dict_cur.description])
             csv_writer.writerows(dict_cur)
-        with open("emails") as csv_file:
+        with open("emails.csv") as csv_file:
             reader = csv.reader(csv_file)
             next(reader)
             for LASTNAME, EMAILADDRESS in reader:
@@ -94,50 +92,10 @@ try:
                     EMAILADDRESS,
                     message.format(name = LASTNAME, recipient = EMAILADDRESS, sender = sender)
                 )
-                print("sent to {name}")
-
-######################################################
-######################################################
-
-        # Email message
-        #message = """\
-        #Subject: Class Attendance {} - Section {}
-        #To: {}
-        #From: {}
-
-        #Greetings, Professor {}.
-
-        #Attached is the attendance for {} - section {}, on {} {}, {}
-        #(insert excel file of students here)
-        #""".format(record[0], record[1], record[2], sender, record[3], record[0], record[1], now.strftime("%b"), now.day, now.year)
-        #messages.append(message)
-
-    # Prints all the messages, this is where the email sending logic should go.
-    #for message in messages:
-        #print(message)
-
-    # Create and read a CSV file with list of professors
-    # Login to server with email and password
-    #with smtplib.SMTP("smtp.gmail.com", 465) as server:
-        #server.login(sender, email_password)
-    # Create CSV file of first name, last name, and email address of PROFESSORS
-    #with open("emails.csv") as csv_file:
-        #csv_writer = csv.writer(csv_file)
-        #csv_writer.writerow([i[0] for i in dict_cur.description])
-        #csv_writer.writerows(dict_cur)
-    #with open("emails") as csv_file:
-        #reader = csv.reader(csv_file)
-        #next(reader)
-        #for LASTNAME, EMAILADDRESS in reader:
-            #server.sendmail(
-                #sender,
-                #EMAILADDRESS,
-                #message.format(name = LASTNAME, recipient = EMAILADDRESS, sender = sender)
-            #)
-            #print("sent to {name}")
+                print("sent email to {}".format(recipient))
 
 except(Exception, psycopg2.Error) as error:
-    print("Error while connecting", error)
+    print(error)
 
 finally:
     #closing database connection.
