@@ -46,17 +46,11 @@ try:
     for record in dict_cur:
         message = MIMEMultipart()
         message['From'] = sender
-        message['To'] = """\
-        {} 
-        """.format(record[2])
+        message['To'] = "{}".format(record[2])
 
-        message['Subject'] = """\
-        Class Attendance {} - Section {}
-        """.format(record[0], record[1])
+        message['Subject'] = "Class Attendance {} - Section {}".format(record[0], record[1])
 
-        body = """\
-        Attached is the attendance for {} - section {}, on {} {}, {}
-        """.format(record[0], record[1], now.strftime("%b"), now.day, now.year)
+        body = "Attached is the attendance for {} - section {}, on {} {}, {}".format(record[0], record[1], now.strftime("%b"), now.day, now.year)
         
         # Add body to email
         message.attach(MIMEText(body, "plain"))
