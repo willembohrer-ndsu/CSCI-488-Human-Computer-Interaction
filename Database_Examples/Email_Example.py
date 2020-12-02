@@ -1,6 +1,7 @@
 import psycopg2
 import psycopg2.extras
-import smtplib, ssl, email
+import smtplib
+import ssl
 import csv
 import datetime
 from email import encoders
@@ -80,7 +81,7 @@ try:
             fieldnames = ["last_name", "email_address"]
             csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
             #csv_writer.writeheader()
-            csv_writer.writerow({"Last name": "{}", "Email Address": "{}"}).format(record[3], record[2])
+            csv_writer.writerow({"last_name": "{}".format(record[3]), "email_address": "{}".format(record[2])})
         # Reads the CSV file and sends an email to the PROFESSORS
         with open("emails.csv", mode='r') as csv_file:
             reader = csv.DictReader(csv_file)
@@ -90,9 +91,9 @@ try:
                 with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
                     server.ehlo()
                     server.login(sender, email_password)
-                    server.sendmail(sender, {row["email_address"]}, text)
-                    print("Email has been sent to {}").format(record[2])
-
+                    print(row["email_address"])
+                    server.sendmail(sender, row["email_address"], text)
+                    
 except(Exception, psycopg2.Error) as error:
     print(error)
 
