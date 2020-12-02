@@ -43,6 +43,7 @@ try:
     email_password = "Human_Computer_Int488"
 
     #messages = []
+    # Creates email
     for record in dict_cur:
         message = MIMEMultipart()
         message['From'] = sender
@@ -57,7 +58,7 @@ try:
 
         filename = "Attendance_{}{}{}.xlsx".format(now.strftime("%b"), now.day, now.year)
 
-        # Open PDF file in binary mode - need to do xcel
+        # Open file in binary mode
         with open(filename, "rb") as attachment:
             part = MIMEBase("application", "octet-stream")
             part.set_payload(attachment.read())
@@ -72,27 +73,25 @@ try:
         message.attach(part)
         text = message.as_string()
         print(sender, email_password)
-        # Login to server and send email
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-            server.ehlo()
-            server.login(sender, email_password)
 
-        # Create CSV file of first name, last name, and email address of PROFESSORS
-        with open("emails.csv") as csv_file:
-            csv_writer = csv.writer(csv_file)
-            csv_writer.writerow([i[0] for i in dict_cur.description])
-            csv_writer.writerows(dict_cur)
-        with open("emails.csv") as csv_file:
-            reader = csv.reader(csv_file)
-            next(reader)
-            for LASTNAME, EMAILADDRESS in reader:
-                server.sendmail(
-                    sender,
-                    EMAILADDRESS,
-                    message.format(name = LASTNAME, recipient = EMAILADDRESS, sender = sender)
-                )
-                print("sent email to {}".format(recipient))
+        # Create CSV file of last name and email address of PROFESSORS
+        with open("emails.csv", mode='w') as csv_file:
+            # Creates a dictionary of last name and professors
+            fieldnames = ["last_name", "email_address"]
+            csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+            #csv_writer.writeheader()
+            csv_writer.writerow({"Last name": "{}", "Email Address": "{}"}).format(record[3], record[2])
+        # Reads the CSV file and sends an email to the PROFESSORS
+        with open("emails.csv", mode='r') as csv_file:
+            reader = csv.DictReader(csv_file)
+            for row in reader:
+                # Login to server and send email
+                context = ssl.create_default_context()
+                with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+                    server.ehlo()
+                    server.login(sender, email_password)
+                    server.sendmail(sender, {row["email_address"]}, text)
+                    print("Email has been sent to {}").format(record[2])
 
 except(Exception, psycopg2.Error) as error:
     print(error)
