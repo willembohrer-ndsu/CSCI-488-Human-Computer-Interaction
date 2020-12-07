@@ -17,6 +17,8 @@ COL_COUNTER = 0
 ROW_COUNTER = 1
 reader = SimpleMFRC522()
 
+# TODO: Implement Web Interface
+
 async def getDBConnection():
     db_conn = psycopg2.connect(user = "ApplicationUser", password = "CoronaSux2020!", host = "localhost", port = "5432", database = "postgres")
     return db_conn
@@ -69,10 +71,12 @@ async def exportExcel():
                 COUNTER += 1
             print('\n')
 
-        # Create a workbook and add a worksheet.
+        # Create an Excel Workbook and add a Worksheet.
         workbook = xlsxwriter.Workbook('Attendance_{}{}{}.xlsx'.format(now.strftime("%b"), now.day, now.year))
+
         # TODO: write logic for dynamically gathering the class and section for the exported attendance spreadsheet
         worksheet = workbook.add_worksheet('Class_Section_TODO')
+
         # Dynamically print all records in the dictionary cursor using their column name and the value
         column_names = [desc[0] for desc in dict_cur.description]
         for record in dict_cur:
@@ -139,7 +143,7 @@ async def emailReport():
         # Add body to email
         message.attach(MIMEText(body, "plain"))
 
-        exportExcel()
+        await exportExcel()
 
         filename = 'Attendance_{}{}{}.xlsx'.format(now.strftime("%b"), now.day, now.year)
 
@@ -174,11 +178,11 @@ async def scanCard():
                     """.format(ROOM_ID, scanned_data))
 
 async def insertClass(email, starttime, endtime, room, days):
-    # TODO: Create an SQL call to insert a class into the database utilizing data from the web interface
+    # TODO: Create an SQL call to insert a Class into the database utilizing data from the Web Interface.
     return
 
 async def emailToProfessor(email):
-    # TODO: create code to call an email export for the specified professor to receive their attendance records
+    # TODO: create code to call an email export for the last two weeks of a specified Professor's classes.
     return
 
 while (True):
