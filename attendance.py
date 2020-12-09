@@ -1,5 +1,6 @@
 import csv
 import time
+import pygame
 import smtplib
 import asyncio
 import schedule
@@ -12,21 +13,20 @@ from mfrc522 import SimpleMFRC522
 
 # Declaration of Constant variables.
 ROOM_ID = 1
-COUNTER = 0
-COL_COUNTER = 0
-ROW_COUNTER = 1
-reader = SimpleMFRC522()
+CONTINUE_SCANNING = True
 
 # TODO: Implement Web Interface
 
-async def getDBConnection():
+def getDBConnection():
     db_conn = psycopg2.connect(user = "ApplicationUser", password = "CoronaSux2020!", host = "localhost", port = "5432", database = "postgres")
     return db_conn
 
 async def exportExcel():
     now = datetime.datetime.now()
     db_conn = getDBConnection()
-
+    COUNTER = 0
+    COL_COUNTER = 0
+    ROW_COUNTER = 1
     section_cur = db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     section_cur.execute("""
                         SELECT
@@ -75,7 +75,7 @@ async def exportExcel():
         workbook = xlsxwriter.Workbook('Attendance_{}{}{}.xlsx'.format(now.strftime("%b"), now.day, now.year))
 
         # TODO: write logic for dynamically gathering the class and section for the exported attendance spreadsheet
-        worksheet = workbook.add_worksheet('Class_Section_TODO')
+        worksheet = workbook.add_worksheet('Section_{}'.format(section_cur))
 
         # Dynamically print all records in the dictionary cursor using their column name and the value
         column_names = [desc[0] for desc in dict_cur.description]
@@ -168,34 +168,48 @@ async def emailReport():
             server.login(sender, email_password)
             server.sendmail(sender, record[2], text)
 
-async def scanCard():
-    # Scan card's data and remove any trailing spaces from the string.
-    id, scanned_data = reader.read_no_block()
-    scanned_data = scanned_data.strip()
-    # Execute database procedure for inserting attendance records.
-    dict_cur.execute("""
-                    CALL LOG_ATTENDANCE({}, {});
-                    """.format(ROOM_ID, scanned_data))
-
-async def insertClass(email, starttime, endtime, room, days):
+async def insertClass(email, name, number, section, starttime, endtime, room, days):
     # TODO: Create an SQL call to insert a Class into the database utilizing data from the Web Interface.
+    db_conn = getDBConnection()
+    dict_cur = db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    #Execute database procedure for inserting class records.
+    dict_cur.execute("""
+                         CALL CREATE_CLASS({}, {}, {}, {}, {}, {}, {}, {}); COMMIT;
+                     """.format(email, name, number, section, starttime, endtime, room, days))
     return
 
 async def emailToProfessor(email):
     # TODO: create code to call an email export for the last two weeks of a specified Professor's classes.
     return
 
-while (True):
-    await scanCard()
-
+try:
+    # Create dictionary cursor in order for pulling data into.
+    GPIO.setwarnings(False)
+    reader = SimpleMFRC522()
+    db_conn = getDBConnection()
+    dict_cur = db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    pygame.init()
+    pygame.mixer.music.set_volume(1.0)
+    pygame.mixer.music.load("ding.mp3")
+    schedule.every().day.at("23:59").do(emailReport)
+    while CONTINUE_SCANNING:
+        schedule.run_pending()
+        # Scan card's data and remove any trailing spaces from the string.
+        id, scanned_data = reader.read()
+        scanned_data = scanned_data.strip()
+        print(scanned_data)
+        #Execute database procedure for inserting attendance records.
+        dict_cur.execute("""
+                             CALL LOG_ATTENDANCE({}, {}); COMMIT;
+                         """.format(ROOM_ID, scanned_data))
+        pygame.mixer.music.play()
+        time.sleep(2)
 except(Exception, psycopg2.Error) as error:
-    print("Error while connecting", error)
-
+    print(error)
 finally:
-    # Closing database connection.
+    #closing database connection.
     if(db_conn):
         dict_cur.close()
         db_conn.close()
-        print("Connection has been closed.")
-    print("Cleaning up.")
-    GPIO.cleanup()
+        GPIO.cleanup()
+        print("Connection has been closed")
