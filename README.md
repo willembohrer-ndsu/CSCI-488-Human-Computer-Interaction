@@ -6,8 +6,8 @@ Purpose:
 Table of Contents
 ======
 - [Application Setup:](#Header)
-  * [Database Setup](Examples\Database_Setup_Instructions.pdf)
-  * [Raspberry Pi Wiring Diagram](Examples\Raspberry_Pi_Wiring_Diagram.png)
+  * [Database Setup](https://github.com/willembohrer-ndsu/CSCI-488-Human-Computer-Interaction/blob/master/Examples/Database%20Setup%20Instructions.pdf)
+  * [Raspberry Pi Wiring Diagram](https://github.com/willembohrer-ndsu/CSCI-488-Human-Computer-Interaction/blob/master/Examples/Raspberry_Pi_Wiring_Diagram.png)
   ---
 - [Application:](#Header)
   * [Demonstration](https://youtu.be/UB6OK7NcDAI)
