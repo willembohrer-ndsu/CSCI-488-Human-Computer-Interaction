@@ -1,99 +1,86 @@
 import csv
+import ssl
 import time
 import pygame
 import smtplib
 import asyncio
+import datetime
 import schedule
 import datetime
 import psycopg2
 import xlsxwriter
 import psycopg2.extras
 import RPi.GPIO as GPIO
+from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from mfrc522 import SimpleMFRC522
+from flask import Flask, render_template
 
 # Declaration of Constant variables.
 ROOM_ID = 1
 CONTINUE_SCANNING = True
 
-# TODO: Implement Web Interface
+#app = Flask(__name__)
+
+#@app.route("/")
+#def home():
+#    return render_template('main.html')
 
 def getDBConnection():
     db_conn = psycopg2.connect(user = "ApplicationUser", password = "CoronaSux2020!", host = "localhost", port = "5432", database = "postgres")
     return db_conn
 
-async def exportExcel():
+def exportExcel(class_name, class_section):
     now = datetime.datetime.now()
     db_conn = getDBConnection()
     COUNTER = 0
     COL_COUNTER = 0
     ROW_COUNTER = 1
-    section_cur = db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    section_cur.execute("""
-                        SELECT
-                            C.SECTION
-                        FROM
-                            STUDENT S
-                            INNER JOIN ATTENDANCE A ON
-                                A.STUDENT_ID = S.ID
-                            INNER JOIN ROOM_SCHEDULE RS ON
-                                RS.ID = A.ROOM_SCHEDULE_ID
-                            INNER JOIN CLASS C ON
-                                C.ROOM_SCHEDULE_ID = RS.ID
+    dict_cur = db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    dict_cur.execute("""
+                    SELECT
+                        S.ID AS {},
+                        S.NAME AS {},
+                        S.EMAILADDRESS AS {},
+                        C.SECTION AS {}
+                    FROM
+                        STUDENT S
+                        INNER JOIN ATTENDANCE A ON
+                            A.STUDENT_ID = S.ID
+                        INNER JOIN ROOM_SCHEDULE RS ON
+                            RS.ID = A.ROOM_SCHEDULE_ID
+                        INNER JOIN CLASS C ON
+                            C.ROOM_SCHEDULE_ID = RS.ID
                         WHERE
                             RS.ROOM_ID = {} AND
+                            C.NAME = '{}' AND
+                            C.SECTION = {} AND
                             A.CREATEDON > CURRENT_DATE - INTERVAL '1' DAY;
-                        """.format(ROOM_ID))
-    for record in section_cur:
-        dict_cur = db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        dict_cur.execute("""
-                        SELECT
-                            S.ID AS {},
-                            S.NAME AS {},
-                            S.EMAILADDRESS AS {}
-                        FROM
-                            STUDENT S
-                            INNER JOIN ATTENDANCE A ON
-                                A.STUDENT_ID = S.ID
-                            INNER JOIN ROOM_SCHEDULE RS ON
-                                RS.ID = A.ROOM_SCHEDULE_ID
-                            INNER JOIN CLASS C ON
-                                C.ROOM_SCHEDULE_ID = RS.ID
-                            WHERE
-                                RS.ROOM_ID = {} AND
-                                A.CREATEDON > CURRENT_DATE - INTERVAL '1' DAY;
-                        """.format('\"Student ID\"','\"Name\"','\"Email Address\"', ROOM_ID))
+                    """.format('\"Student ID:\"','\"Name:\"','\"Email Address:\"','\"Section:\"', ROOM_ID, class_name, class_section))
 
-        for record in dict_cur:
-            column_names = [desc[0] for desc in dict_cur.description]
-            COUNTER = 0
-            for column in record:
-                print('{}: {}'.format(column_names[COUNTER], column))
+    # Create an Excel Workbook and add a Worksheet.
+    workbook = xlsxwriter.Workbook('Attendance_{}{}{}.xlsx'.format(now.strftime("%b"), now.day, now.year))
+    worksheet = workbook.add_worksheet('Section_{}'.format(class_section))
+
+    # Dynamically write all records in the dictionary cursor using their column name and the value
+    column_names = [desc[0] for desc in dict_cur.description]
+    for record in dict_cur:
+        for column in record:
+            if(COUNTER == 0):
+                while COL_COUNTER < len(column_names):
+                    worksheet.write(0, COL_COUNTER, column_names[COL_COUNTER])
+                    COL_COUNTER += 1
                 COUNTER += 1
-            print('\n')
+        COL_COUNTER = 0
+        for row in record:
+            worksheet.write(ROW_COUNTER, COL_COUNTER, row)
+            COL_COUNTER += 1
+        ROW_COUNTER += 1
+    workbook.close()
 
-        # Create an Excel Workbook and add a Worksheet.
-        workbook = xlsxwriter.Workbook('Attendance_{}{}{}.xlsx'.format(now.strftime("%b"), now.day, now.year))
-
-        # TODO: write logic for dynamically gathering the class and section for the exported attendance spreadsheet
-        worksheet = workbook.add_worksheet('Section_{}'.format(section_cur))
-
-        # Dynamically print all records in the dictionary cursor using their column name and the value
-        column_names = [desc[0] for desc in dict_cur.description]
-        for record in dict_cur:
-            for column in record:
-                if(COUNTER == 0):
-                    while COL_COUNTER < len(column_names):
-                        worksheet.write(0, COL_COUNTER, column_names[COL_COUNTER])
-                        COL_COUNTER += 1
-                    COUNTER += 1
-            COL_COUNTER = 0
-            for row in record:
-                worksheet.write(ROW_COUNTER, COL_COUNTER, row)
-                COL_COUNTER += 1
-            ROW_COUNTER += 1
-        workbook.close()
-
-async def emailReport():
+def emailReport():
     now = datetime.datetime.now()
     db_conn = getDBConnection()
 
@@ -126,12 +113,6 @@ async def emailReport():
 
     # Creates email
     for record in dict_cur:
-        column_names = [desc[0] for desc in dict_cur.description]
-        COUNTER = 0
-        for column in record:
-            print('{}: {}'.format(column_names[COUNTER], column))
-            COUNTER += 1
-        print('\n')
         message = MIMEMultipart()
         message['From'] = sender
         message['To'] = "{}".format(record[2])
@@ -143,7 +124,7 @@ async def emailReport():
         # Add body to email
         message.attach(MIMEText(body, "plain"))
 
-        await exportExcel()
+        exportExcel(record[0], record[1])
 
         filename = 'Attendance_{}{}{}.xlsx'.format(now.strftime("%b"), now.day, now.year)
 
@@ -168,18 +149,14 @@ async def emailReport():
             server.login(sender, email_password)
             server.sendmail(sender, record[2], text)
 
-async def insertClass(email, name, number, section, starttime, endtime, room, days):
-    # TODO: Create an SQL call to insert a Class into the database utilizing data from the Web Interface.
+def insertClass(email, name, number, section, starttime, endtime, room, days):
+    # SQL call to insert a Class into the database utilizing data from the Web Interface.
     db_conn = getDBConnection()
     dict_cur = db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    #Execute database procedure for inserting class records.
+    # Execute database procedure for inserting class records.
     dict_cur.execute("""
                          CALL CREATE_CLASS({}, {}, {}, {}, {}, {}, {}, {}); COMMIT;
                      """.format(email, name, number, section, starttime, endtime, room, days))
-    return
-
-async def emailToProfessor(email):
-    # TODO: create code to call an email export for the last two weeks of a specified Professor's classes.
     return
 
 try:
@@ -188,20 +165,25 @@ try:
     reader = SimpleMFRC522()
     db_conn = getDBConnection()
     dict_cur = db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    # Initialize sound to be played on a scan.
     pygame.init()
     pygame.mixer.music.set_volume(1.0)
     pygame.mixer.music.load("ding.mp3")
-    schedule.every().day.at("23:59").do(emailReport)
+    # Schedule the daily export of attendance.
+    #schedule.every().day.at("23:59").do(emailReport)
+    schedule.every().minute.at(":15").do(emailReport)
     while CONTINUE_SCANNING:
+        #app.run(debug = False)
+        # Run any scheduled exports
         schedule.run_pending()
         # Scan card's data and remove any trailing spaces from the string.
         id, scanned_data = reader.read()
         scanned_data = scanned_data.strip()
-        print(scanned_data)
-        #Execute database procedure for inserting attendance records.
+        # Execute database procedure for inserting attendance records.
         dict_cur.execute("""
                              CALL LOG_ATTENDANCE({}, {}); COMMIT;
                          """.format(ROOM_ID, scanned_data))
+        # Play sound after a successful scan
         pygame.mixer.music.play()
         time.sleep(2)
 except(Exception, psycopg2.Error) as error:
