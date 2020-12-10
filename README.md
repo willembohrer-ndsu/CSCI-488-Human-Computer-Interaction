@@ -5,10 +5,9 @@ Purpose:
 
 Table of Contents
 ======
-- [Standard Folders:](#Header)
-  * [Database Files](https://github.com/willembohrer-ndsu/CSCI-488-Human-Computer-Interaction/tree/master/Database)
-  * [Source Files](https://github.com/willembohrer-ndsu/CSCI-488-Human-Computer-Interaction/tree/master/Sources)
-  * [Examples of Functionality](https://github.com/willembohrer-ndsu/CSCI-488-Human-Computer-Interaction/tree/master/Examples)
+- [Application Setup:](#Header)
+  * [Database Setup](Examples\Database_Setup_Instructions.pdf)
+  * [Raspberry Pi Wiring Diagram](Examples\Raspberry_Pi_Wiring_Diagram.png)
   ---
 - [Application:](#Header)
   * [Demonstration](https://youtu.be/UB6OK7NcDAI)
