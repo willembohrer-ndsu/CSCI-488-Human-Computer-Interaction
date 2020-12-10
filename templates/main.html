@@ -1,68 +1,61 @@
 <!doctype html>
 <html>
-<head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RFID ID Tracing</title>
-<link href="static/style.css" rel="stylesheet" type="text/css">
-<link href="static/bootstrap-4.4.1.css" rel="stylesheet" type="text/css">
-</head>
-<img src="/static/RFID ID TRACING Logo.PNG" style="width:250px;height:62px;" alt="" class="center"/>
-
-<body>
-<br>
-<h3>Class Setup:</h3>
-<br>
-<label for="lblProfessorEmail">Professor Email:</label>
-<input type="text" name="txtProfessorEmail" id="txtProfessorEmail">
-<br>
-<label for="lblClassName">Class Name:</label>
-<input type="text" name="txtClassName" id="txtClassName">
-<br>
-<label for="textfield4">Class Number:</label>
-<input type="text" name="txtClassNumber" id="txtClassNumber">
-<br>
-<label for="textfield5">Class Section Number:&nbsp;</label>
-<input type="text" name="txtClassSectionNumber" id="txtClassSectionNumber">
-<br>
-<label for="lblStartTime">Start Time:</label>
-<input type="time" name="tmStartTime" id="tmStartTime">
-<label for="lblEndTime">End Time:</label>
-<input type="time" name="tmEndTime" id="tmEndTime">
-<br>
-<label>Class Day Selector:</label>
-<div class="weekDays-selector">
-  <input type="checkbox" id="weekday-mon" class="weekday" />
-  <label for="weekday-mon">M</label>
-  <input type="checkbox" id="weekday-tue" class="weekday" />
-  <label for="weekday-tue">T</label>
-  <input type="checkbox" id="weekday-wed" class="weekday" />
-  <label for="weekday-wed">W</label>
-  <input type="checkbox" id="weekday-thu" class="weekday" />
-  <label for="weekday-thu">T</label>
-  <input type="checkbox" id="weekday-fri" class="weekday" />
-  <label for="weekday-fri">F</label>
-</div>
-<div class="dropdown show"> <a class="btn btn-sm dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Building </a>
-  <div class="dropdown-menu"> <a class="dropdown-item" href="#">First Link</a> </div>
-</div>
-<div class="dropdown show"> <a class="btn btn-sm dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Room Number </a>
-  <div class="dropdown-menu"> <a class="dropdown-item" href="#">First Link</a> </div>
-</div>
-<br>
-<input type="button" name="btnAddClass" id="btnAddClass" value="Add Class">
-<br>
-<br>
-<h3>Data Export:</h3>
-<label>All student attendance data exported via email.</label>
-<br>
-<label for="textfield">Send To Email Address:</label>
-<input type="text" name="txtSendToEmailAddress" id="txtSendToEmailAddress">
-<br>
-<input type="button" name="button" id="button" value="Send">
-<script src="js/jquery-3.4.1.min.js"></script> 
-<script src="js/popper.min.js"></script> 
-<script src="js/bootstrap-4.4.1.js"></script>
-</body>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>RFID ID Tracing</title>
+		<link href="static/style.css" rel="stylesheet" type="text/css">
+		<link href="static/bootstrap-4.4.1.css" rel="stylesheet" type="text/css">
+	</head>
+	<img src="/static/RFID ID TRACING Logo.PNG" style="width:250px;height:62px;" alt="" class="center"/>
+	<body>
+		<br>
+		<h3>Class Setup:</h3>
+		<br>
+		<label for="lblProfessorEmail">Professor Email:</label>
+		<input type="text" name="txtProfessorEmail" id="txtProfessorEmail">
+		<br>
+		<label for="lblClassName">Class Name:</label>
+		<input type="text" name="txtClassName" id="txtClassName">
+		<br>
+		<label for="textfield4">Class Number:</label>
+		<input type="text" name="txtClassNumber" id="txtClassNumber">
+		<br>
+		<label for="textfield5">Class Section Number:&nbsp;</label>
+		<input type="text" name="txtClassSectionNumber" id="txtClassSectionNumber">
+		<br>
+		<label for="lblStartTime">Start Time:</label>
+		<input type="time" name="tmStartTime" id="tmStartTime">
+		<label for="lblEndTime">End Time:</label>
+		<input type="time" name="tmEndTime" id="tmEndTime">
+		<br>
+		<label>Class Day Selector:</label>
+		<div class="weekDays-selector">
+			<input type="checkbox" id="weekday-mon" class="weekday" />
+			<label for="weekday-mon">M</label>
+			<input type="checkbox" id="weekday-tue" class="weekday" />
+			<label for="weekday-tue">T</label>
+			<input type="checkbox" id="weekday-wed" class="weekday" />
+			<label for="weekday-wed">W</label>
+			<input type="checkbox" id="weekday-thu" class="weekday" />
+			<label for="weekday-thu">T</label>
+			<input type="checkbox" id="weekday-fri" class="weekday" />
+			<label for="weekday-fri">F</label>
+		</div>
+		<div class="dropdown show">
+			<a class="btn btn-sm dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Building </a>
+        <SELECT name="building">
+          {%for building in buildinglist%}
+          <OPTION value={{building.Room_ID}}>{{building.Name}}</OPTION>
+          {{% endfor %}}
+        </SELECT>
+		</div>
+		<div class="dropdown show">
+			<a class="btn btn-sm dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Room Number </a>
+			<div class="dropdown-menu"> <a class="dropdown-item" href="#">First Link</a> </div>
+		</div>
+		<br>
+		<input type="button" name="btnAddClass" id="btnAddClass" value="Add Class">
+		<br>
 </html>
