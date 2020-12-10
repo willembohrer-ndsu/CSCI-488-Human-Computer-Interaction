@@ -1,6 +1,7 @@
 Purpose:
-With the global pandemic taking place in our daily lives, contact tracing has become part of the “new normal”. We are creating a project that makes contact tracing easier with radio-frequency identification (RFID) systems. This project is important because as COVID-19 continues to be an issue, people are looking for more technological advances to promote a healthy and safe lifestyle. If our project was implemented within the university, there would be RFID card readers by the door of every classroom. Then, students would scan their Student ID card entering the classroom. The system would generate a list of all the students who went to in-person class that day. Professors would have a previously made seating chart for students so that they can easily identify who came to class and where they sat. This application would create an easier system for faculty as they then do not have to take photos of classes or take attendance.
-======
+
+ With the global pandemic taking place in our daily lives, contact tracing has become part of the “new normal”. We are creating a project that makes contact tracing easier with radio-frequency identification (RFID) systems. This project is important because as COVID-19 continues to be an issue, people are looking for more technological advances to promote a healthy and safe lifestyle. If our project was implemented within the university, there would be RFID card readers by the door of every classroom. Then, students would scan their Student ID card entering the classroom. The system would generate a list of all the students who went to in-person class that day. Professors would have a previously made seating chart for students so that they can easily identify who came to class and where they sat. This application would create an easier system for faculty as they then do not have to take photos of classes or take attendance.
+
 Table of Contents
 ======
 - [Standard Folders:](#Header)
