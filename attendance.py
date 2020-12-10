@@ -170,8 +170,7 @@ try:
     pygame.mixer.music.set_volume(1.0)
     pygame.mixer.music.load("ding.mp3")
     # Schedule the daily export of attendance.
-    #schedule.every().day.at("23:59").do(emailReport)
-    schedule.every().minute.at(":15").do(emailReport)
+    schedule.every().day.at("23:59").do(emailReport)
     while CONTINUE_SCANNING:
         #app.run(debug = False)
         # Run any scheduled exports
