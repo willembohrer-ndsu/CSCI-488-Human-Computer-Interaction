@@ -8,6 +8,9 @@ Table of Contents
 - [Application Setup:](#Header)
   * [Database Setup](https://github.com/willembohrer-ndsu/CSCI-488-Human-Computer-Interaction/blob/master/Examples/Database%20Setup%20Instructions.pdf)
   * [Raspberry Pi Wiring Diagram](https://github.com/willembohrer-ndsu/CSCI-488-Human-Computer-Interaction/blob/master/Examples/Raspberry_Pi_Wiring_Diagram.png)
+  * [Bootstrap Setup](#Header)
+    - sudo apt-get install python3-flask
+    - pip install flask-bootstrap
   ---
 - [Application:](#Header)
   * [Demonstration](https://youtu.be/UB6OK7NcDAI)
