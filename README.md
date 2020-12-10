@@ -8,6 +8,6 @@ Table of Contents
 - [Application:](https://youtu.be/UB6OK7NcDAI)
   * [App](attendance.py)
   * [Website](templates)
-    *[Home Page](templates/main.html)
+    * [Home Page](templates/main.html)
   * [Website Styling](static)
   ---
