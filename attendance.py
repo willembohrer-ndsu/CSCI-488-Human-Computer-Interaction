@@ -8,6 +8,7 @@ import datetime
 import schedule
 import datetime
 import psycopg2
+import threading
 import xlsxwriter
 import psycopg2.extras
 import RPi.GPIO as GPIO
@@ -22,15 +23,31 @@ from flask import Flask, render_template
 ROOM_ID = 1
 CONTINUE_SCANNING = True
 
-#app = Flask(__name__)
-
-#@app.route("/")
-#def home():
-#    return render_template('main.html')
+app = Flask(__name__)
 
 def getDBConnection():
     db_conn = psycopg2.connect(user = "ApplicationUser", password = "CoronaSux2020!", host = "localhost", port = "5432", database = "postgres")
     return db_conn
+
+@app.route("/")
+def home():
+    db_conn = getDBConnection()
+    buildinglist = db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    buildinglist.execute("""
+                        SELECT DISTINCT
+                            R.ID AS {},
+                            R.BUILDING AS {}
+                        FROM
+                            ROOM R
+                        WHERE
+                            R.ACTIVE = TRUE;
+                     """.format('\"Room_ID\"','\"Name\"'))
+
+    return render_template("main.html", buildinglist=buildinglist)
+
+@app.route("/setRoom", methods = ["POST"])
+def setRoom():
+    return 'Room Test'
 
 def exportExcel(class_name, class_section):
     now = datetime.datetime.now()
@@ -159,38 +176,46 @@ def insertClass(email, name, number, section, starttime, endtime, room, days):
                      """.format(email, name, number, section, starttime, endtime, room, days))
     return
 
-try:
-    # Create dictionary cursor in order for pulling data into.
-    GPIO.setwarnings(False)
-    reader = SimpleMFRC522()
-    db_conn = getDBConnection()
-    dict_cur = db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    # Initialize sound to be played on a scan.
-    pygame.init()
-    pygame.mixer.music.set_volume(1.0)
-    pygame.mixer.music.load("ding.mp3")
-    # Schedule the daily export of attendance.
-    schedule.every().day.at("23:59").do(emailReport)
-    while CONTINUE_SCANNING:
-        #app.run(debug = False)
-        # Run any scheduled exports
-        schedule.run_pending()
-        # Scan card's data and remove any trailing spaces from the string.
-        id, scanned_data = reader.read()
-        scanned_data = scanned_data.strip()
-        # Execute database procedure for inserting attendance records.
-        dict_cur.execute("""
-                             CALL LOG_ATTENDANCE({}, {}); COMMIT;
-                         """.format(ROOM_ID, scanned_data))
-        # Play sound after a successful scan
-        pygame.mixer.music.play()
-        time.sleep(2)
-except(Exception, psycopg2.Error) as error:
-    print(error)
-finally:
-    #closing database connection.
-    if(db_conn):
-        dict_cur.close()
-        db_conn.close()
-        GPIO.cleanup()
-        print("Connection has been closed")
+@app.before_first_request
+def activate_scanning():
+    def run_scanning():
+        try:
+            # Create dictionary cursor in order for pulling data into.
+            GPIO.setwarnings(False)
+            reader = SimpleMFRC522()
+            db_conn = getDBConnection()
+            dict_cur = db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            # Initialize sound to be played on a scan.
+            pygame.init()
+            pygame.mixer.music.set_volume(1.0)
+            pygame.mixer.music.load("ding.mp3")
+            # Schedule the daily export of attendance.
+            #schedule.every().day.at("23:59").do(emailReport)
+            schedule.every().minute.at(":15").do(emailReport)
+            while CONTINUE_SCANNING:
+                # Run any scheduled exports
+                schedule.run_pending()
+                # Scan card's data and remove any trailing spaces from the string.
+                id, scanned_data = reader.read()
+                scanned_data = scanned_data.strip()
+                # Execute database procedure for inserting attendance records.
+                dict_cur.execute("""
+                                     CALL LOG_ATTENDANCE({}, {}); COMMIT;
+                                 """.format(ROOM_ID, scanned_data))
+                # Play sound after a successful scan
+                pygame.mixer.music.play()
+                time.sleep(2)
+        except(Exception, psycopg2.Error) as error:
+            print(error)
+        finally:
+            #closing database connection.
+            if(db_conn):
+                dict_cur.close()
+                db_conn.close()
+                GPIO.cleanup()
+                print("Connection has been closed")
+
+    thread = threading.Thread(target=run_scanning)
+    thread.start()
+
+app.run(debug = False)

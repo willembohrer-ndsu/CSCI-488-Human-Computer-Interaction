@@ -43,14 +43,12 @@
 			<input type="checkbox" id="weekday-fri" class="weekday" />
 			<label for="weekday-fri">F</label>
 		</div>
-		<div class="dropdown show">
-			<a class="btn btn-sm dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Building </a>
-        <SELECT name="building">
-          {%for building in buildinglist%}
+		<label>Building:</label>
+		<SELECT name="building">
+          {% for building in buildinglist %}
           <OPTION value={{building.Room_ID}}>{{building.Name}}</OPTION>
-          {{% endfor %}}
+          {% endfor %}
         </SELECT>
-		</div>
 		<div class="dropdown show">
 			<a class="btn btn-sm dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Room Number </a>
 			<div class="dropdown-menu"> <a class="dropdown-item" href="#">First Link</a> </div>

@@ -16,12 +16,12 @@ Table of Contents
   * [Website](templates)
     - [Home Page](templates/main.html)
   * [Website Styling](static)
-    - [Logo](static/RFID ID TRACING Logo.PNG)
+    - [Logo](https://github.com/willembohrer-ndsu/CSCI-488-Human-Computer-Interaction/blob/master/static/RFID%20ID%20TRACING%20Logo.PNG)
     - [CSS](static/style.css)
     - [Bootstrap](static/bootstrap-4.4.1.css)
   ---
 Authors:
 ======
-- [Willem Bohrer:](https://www.linkedin.com/in/willembohrer/)
-- [Nathan Marcotte:](https://www.linkedin.com/in/nathanmarcotte/)
-- [Ansley Schug:](https://www.linkedin.com/in/ansley-schug-51b236179/)
+- [Willem Bohrer](https://www.linkedin.com/in/willembohrer/)
+- [Nathan Marcotte](https://www.linkedin.com/in/nathanmarcotte/)
+- [Ansley Schug](https://www.linkedin.com/in/ansley-schug-51b236179/)
