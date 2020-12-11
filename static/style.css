@@ -20,6 +20,7 @@
 	width: 50%;
 }
 
+/* custom formatting for checkboxes for days of the week selector */
 .weekDays-selector input[type=checkbox] + label {
   display: inline-block;
   border-radius: 6px;
