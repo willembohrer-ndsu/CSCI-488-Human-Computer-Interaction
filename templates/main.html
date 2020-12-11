@@ -13,47 +13,44 @@
 		<br>
 		<h3>Class Setup:</h3>
 		<br>
-		<label for="lblProfessorEmail">Professor Email:</label>
-		<input type="text" name="txtProfessorEmail" id="txtProfessorEmail">
-		<br>
-		<label for="lblClassName">Class Name:</label>
-		<input type="text" name="txtClassName" id="txtClassName">
-		<br>
-		<label for="textfield4">Class Number:</label>
-		<input type="text" name="txtClassNumber" id="txtClassNumber">
-		<br>
-		<label for="textfield5">Class Section Number:&nbsp;</label>
-		<input type="text" name="txtClassSectionNumber" id="txtClassSectionNumber">
-		<br>
-		<label for="lblStartTime">Start Time:</label>
-		<input type="time" name="tmStartTime" id="tmStartTime">
-		<label for="lblEndTime">End Time:</label>
-		<input type="time" name="tmEndTime" id="tmEndTime">
-		<br>
-		<label>Class Day Selector:</label>
-		<div class="weekDays-selector">
-			<input type="checkbox" id="weekday-mon" class="weekday" />
+		<!--<textarea name="txtProfessorEmail" class="form-control">{{request.form['txtProfessorEmail']}}</textarea>-->
+		<form action="/createClass" method="post">
+			<label for="lblProfessorEmail">Professor Email:</label>
+			<input type="text" name="txtProfessorEmail" id="txtProfessorEmail"></input>
+			<br>
+			<label for="lblClassName">Class Name:</label>
+			<input type="text" name="txtClassName" id="txtClassName"></input>
+			<br>
+			<label for="textfield4">Class Number:</label>
+			<input type="text" name="txtClassNumber" id="txtClassNumber"></input>
+			<br>
+			<label for="textfield5">Class Section Number:&nbsp;</label>
+			<input type="text" name="txtClassSectionNumber" id="txtClassSectionNumber"></input>
+			<br>
+			<label for="lblStartTime">Start Time:</label>
+			<input type="time" name="tmStartTime" id="tmStartTime">
+			<label for="lblEndTime">End Time:</label>
+			<input type="time" name="tmEndTime" id="tmEndTime">
+			<br>
+			<label>Class Day Selector:</label>
+			<input type="checkbox" name="check" id = "test" value="Monday" class="weekday" />
 			<label for="weekday-mon">M</label>
-			<input type="checkbox" id="weekday-tue" class="weekday" />
+			<input type="checkbox" name="check" value="Tuesday" class="weekday" />
 			<label for="weekday-tue">T</label>
-			<input type="checkbox" id="weekday-wed" class="weekday" />
+			<input type="checkbox" name="check" value="Wednesday" class="weekday" />
 			<label for="weekday-wed">W</label>
-			<input type="checkbox" id="weekday-thu" class="weekday" />
+			<input type="checkbox" name="check" value="Thursday" class="weekday" />
 			<label for="weekday-thu">T</label>
-			<input type="checkbox" id="weekday-fri" class="weekday" />
+			<input type="checkbox" name="check" value="Friday" class="weekday" />
 			<label for="weekday-fri">F</label>
-		</div>
-		<label>Building:</label>
-		<SELECT name="building">
-          {% for building in buildinglist %}
-          <OPTION value={{building.Room_ID}}>{{building.Name}}</OPTION>
-          {% endfor %}
-        </SELECT>
-		<div class="dropdown show">
-			<a class="btn btn-sm dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Room Number </a>
-			<div class="dropdown-menu"> <a class="dropdown-item" href="#">First Link</a> </div>
-		</div>
-		<br>
-		<input type="button" name="btnAddClass" id="btnAddClass" value="Add Class">
-		<br>
+			<br>
+			<label>Building - Room:</label>
+			<SELECT name="building">
+				{% for building in buildinglist %}
+				<OPTION value={{building.Room_ID}}>{{building.Name}}</OPTION>
+				{% endfor %}
+			</SELECT>
+			<br>
+			<input type="submit" name="btnAddClass" id="btnAddClass" value="Add Class">
+		</form>
 </html>

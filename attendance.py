@@ -17,7 +17,7 @@ from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from mfrc522 import SimpleMFRC522
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect
 
 # Declaration of Constant variables.
 ROOM_ID = 1
@@ -36,14 +36,30 @@ def home():
     buildinglist.execute("""
                         SELECT DISTINCT
                             R.ID AS {},
-                            R.BUILDING AS {}
+                            CONCAT(R.BUILDING, ' - ', R.NUMBER) AS {}
                         FROM
                             ROOM R
                         WHERE
                             R.ACTIVE = TRUE;
                      """.format('\"Room_ID\"','\"Name\"'))
+    
+    return render_template("main.html", buildinglist = buildinglist)
 
-    return render_template("main.html", buildinglist=buildinglist)
+@app.route('/createClass', methods = ['POST'])
+def createClass():
+    email = request.form['txtProfessorEmail']
+    class_name = request.form['txtClassName']
+    class_number = request.form['txtClassNumber']
+    class_section = request.form['txtClassSectionNumber']
+    start_time = request.form['tmStartTime']
+    end_time = request.form['tmEndTime']
+    days = request.form.getlist('check')
+    building = request.form['building']
+    for i in range(len(days)):
+        print (days[i])
+    print(email, class_name, class_number, class_section, start_time, end_time, building)
+    insertClass(email, class_name, class_number, class_section, start_time, end_time, days, building)
+    return redirect('/')
 
 @app.route("/setRoom", methods = ["POST"])
 def setRoom():
@@ -166,14 +182,17 @@ def emailReport():
             server.login(sender, email_password)
             server.sendmail(sender, record[2], text)
 
-def insertClass(email, name, number, section, starttime, endtime, room, days):
+def insertClass(email, name, number, section, starttime, endtime, days, room):
     # SQL call to insert a Class into the database utilizing data from the Web Interface.
     db_conn = getDBConnection()
     dict_cur = db_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    # Execute database procedure for inserting class records.
-    dict_cur.execute("""
-                         CALL CREATE_CLASS({}, {}, {}, {}, {}, {}, {}, {}); COMMIT;
-                     """.format(email, name, number, section, starttime, endtime, room, days))
+    for day in range(len(days)):
+        print (days[day])
+        # Execute database procedure for inserting class records.
+        dict_cur.execute("""
+                             CALL CREATE_CLASS(CAST('{}' AS TEXT), CAST('{}' AS VARCHAR), CAST('{}' AS VARCHAR), {}, CAST('{}' AS TIME), CAST('{}' AS TIME), '{}', {}); COMMIT;
+                         """.format(email, name, number, section, starttime, endtime, day, room))
+        print("hello from insertion")
     return
 
 @app.before_first_request
