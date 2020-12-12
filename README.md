@@ -12,7 +12,12 @@ Table of Contents
     - sudo apt-get install python3-flask
     - pip install flask-bootstrap
   ---
-- [Application:](#Header)
+- [Hardware:](#Header)
+  * [Raspberry Pi 3](https://www.amazon.com/CanaKit-Raspberry-Complete-Starter-Kit/dp/B01C6Q2GSY/ref=pd_ybh_a_22?_encoding=UTF8&psc=1&refRID=35T7A46PN0XMSMX3S1VC)
+  * [Mifare RC522](https://www.amazon.com/HiLetgo-3pcs-RFID-Kit-Raspberry/dp/B07VLDSYRW/ref=pd_ybh_a_19?_encoding=UTF8&psc=1&refRID=5QF5F4H6F3DQATS92ZB5)
+  * [Wires](https://www.amazon.com/Elegoo-EL-CP-004-Multicolored-Breadboard-arduino/dp/B01EV70C78/ref=pd_ybh_a_31?_encoding=UTF8&psc=1&refRID=NXM073ZB63B2DCSFN6ZF)
+  ---
+- [Software:](#Header)
   * [Demonstration](https://youtu.be/UB6OK7NcDAI)
   * [App](attendance.py)
   * [Website](templates)
